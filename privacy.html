@@ -36,6 +36,7 @@ table{border-collapse:collapse;width:100%;min-width:560px}
 th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--border);font-size:15px;line-height:1.5;color:var(--text)}
 th{font-size:13px;color:var(--text-sub);background:var(--surface2)}
 tr:last-child td{border-bottom:0}
+code{background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:15px}
 .updated{font-size:15px;color:var(--text-sub)}
 .badge{display:inline-block;font-size:15px;color:var(--text);border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:6px 14px;margin:4px 6px 4px 0}
 footer{margin-top:44px;font-size:14px;color:var(--text-sub)}
@@ -62,7 +63,7 @@ acesso e exclusão: <a href="mailto:joncqs@gmail.com">joncqs@gmail.com</a>.</p>
 <h2>Como você entra</h2>
 <ul>
 <li><strong>Google:</strong> o Firebase Authentication recebe seu identificador, e-mail, nome e foto do perfil Google.</li>
-<li><strong>Convidado:</strong> cria uma identidade anônima no Firebase, sem e-mail. No modo Convidado as conversas não são gravadas na nossa base (só ficam na tela).</li>
+<li><strong>Convidado:</strong> também cria uma identidade anônima no Firebase e um registro de perfil sem e-mail (<code>users/{uid}</code>, provedor "anônimo"). As conversas do Convidado não são gravadas na nossa base (só ficam na tela), e o áudio gravado por ele fica só no aparelho.</li>
 <li>O botão do Facebook aparece como "em breve" e não funciona: nada é coletado por ele.</li>
 </ul>
 <h2>O que guardamos e onde</h2>
@@ -76,19 +77,20 @@ acesso e exclusão: <a href="mailto:joncqs@gmail.com">joncqs@gmail.com</a>.</p>
 </table></div>
 <h2>Para quem seu texto e sua voz vão</h2>
 <ul>
-<li><strong>Nosso servidor intermediário (Cloudflare Workers):</strong> recebe o histórico da conversa e o contexto que você ligou (instruções do agente, skills, conhecimento, memória) e repassa. Não gravamos o conteúdo das conversas nele.</li>
+<li><strong>Nosso servidor intermediário (Cloudflare Workers):</strong> recebe o histórico da conversa e o contexto que você ligou (instruções do agente, skills, conhecimento, memória) e repassa. O nosso código não armazena o conteúdo das conversas; a Cloudflare pode manter registros técnicos de requisição (como IP e horário), conforme a política dela.</li>
 <li><strong>OpenRouter e os provedores dos modelos gratuitos:</strong> recebem esse conteúdo para gerar a resposta. Usamos somente modelos marcados como gratuitos. Cada provedor tem a sua própria política e pode manter ou usar os dados conforme ela, o que não controlamos.</li>
 <li><strong>Groq:</strong> recebe o áudio para transcrição (modelo Whisper).</li>
+<li><strong>ui-avatars.com:</strong> se a sua conta não tem foto, o app gera um avatar com as iniciais e esse serviço recebe o seu nome (na URL da imagem).</li>
 <li><strong>Busca na web:</strong> quando a pergunta pede informação atual, o servidor usa DuckDuckGo, Google News e as páginas encontradas (Wikipedia incluída), com termos tirados da sua pergunta.</li>
 <li>Não enviamos dados a anunciantes e não os vendemos.</li>
 </ul>
 <h2>O que fica só no aparelho</h2>
-<p>A sessão de login e o idioma ficam no armazenamento local do app. Os arquivos de áudio gravados ficam na pasta do app e saem com a desinstalação.
+<p>A sessão de login e o idioma ficam no armazenamento local do app, e o Firestore mantém um cache offline das suas conversas no aparelho. Os arquivos de áudio gravados ficam na pasta do app e saem com a desinstalação.
 Gravações sem fala são apagadas na hora. A permissão de microfone é pedida só para gravar sua voz; você pode negá-la e continuar por texto.</p>
 <h2>Seus direitos e como apagar</h2>
 <ul>
-<li>No app você pode <strong>excluir um agente</strong> (com as memórias dele) e <strong>limpar o histórico</strong> de conversas (contas logadas), mas isso não equivale a excluir a conta, e partes do conteúdo antigo podem permanecer na base até a exclusão completa.</li>
-<li>Para <strong>excluir a conta e todos os dados</strong>, acessar ou corrigir seus dados, escreva para <a href="mailto:joncqs@gmail.com">joncqs@gmail.com</a> com o e-mail da conta. Responderemos em prazo razoável e apagaremos o que estiver sob o nosso controle.</li>
+<li>No app você pode <strong>excluir um agente</strong> (com as memórias dele) e <strong>limpar o histórico</strong> de conversas (contas logadas). Ao limpar o histórico as mensagens somem do app, mas ficam na base até a exclusão completa; isso não equivale a excluir a conta.</li>
+<li>Para <strong>excluir a conta e todos os dados</strong>, acessar ou corrigir seus dados, escreva para <a href="mailto:joncqs@gmail.com">joncqs@gmail.com</a> com o e-mail da conta. Responderemos em prazo razoável. A exclusão é feita por nós e apaga o usuário no Firebase Authentication e os documentos de usuário, conversas, mensagens, agentes, fontes e memórias.</li>
 <li>Dados que já foram enviados a provedores de IA de terceiros seguem as regras deles.</li>
 </ul>
 <h2>Crianças</h2>
@@ -109,7 +111,7 @@ deletion: <a href="mailto:joncqs@gmail.com">joncqs@gmail.com</a>.</p>
 <h2>How you sign in</h2>
 <ul>
 <li><strong>Google:</strong> Firebase Authentication receives your identifier, email, name and Google profile photo.</li>
-<li><strong>Guest:</strong> creates an anonymous Firebase identity, with no email. In Guest mode chats are not saved to our database (they stay on screen only).</li>
+<li><strong>Guest:</strong> also creates an anonymous Firebase identity and a profile record with no email (<code>users/{uid}</code>, provider "anonymous"). Guest chats are not saved to our database (they stay on screen only), and audio recorded by a Guest stays on the device only.</li>
 <li>The Facebook button shows "coming soon" and does not work: nothing is collected through it.</li>
 </ul>
 <h2>What we store and where</h2>
@@ -123,19 +125,20 @@ deletion: <a href="mailto:joncqs@gmail.com">joncqs@gmail.com</a>.</p>
 </table></div>
 <h2>Where your text and voice go</h2>
 <ul>
-<li><strong>Our intermediary server (Cloudflare Workers):</strong> receives the chat history and the context you turned on (agent instructions, skills, knowledge, memory) and forwards it. We do not store chat content on it.</li>
+<li><strong>Our intermediary server (Cloudflare Workers):</strong> receives the chat history and the context you turned on (agent instructions, skills, knowledge, memory) and forwards it. Our code does not store chat content; Cloudflare may keep technical request logs (such as IP and time) under its own policy.</li>
 <li><strong>OpenRouter and the free-model providers:</strong> receive that content to generate the answer. We only use models marked as free. Each provider has its own policy and may keep or use data under it, which we do not control.</li>
 <li><strong>Groq:</strong> receives the audio for transcription (Whisper model).</li>
+<li><strong>ui-avatars.com:</strong> if your account has no photo, the app generates an avatar with your initials and this service receives your name (in the image URL).</li>
 <li><strong>Web search:</strong> when a question needs current information, the server uses DuckDuckGo, Google News and the pages found (including Wikipedia), with terms taken from your question.</li>
 <li>We do not send data to advertisers and we do not sell it.</li>
 </ul>
 <h2>What stays on the device</h2>
-<p>The sign-in session and language are kept in the app local storage. Recorded audio files stay in the app folder and are removed when you uninstall.
+<p>The sign-in session and language are kept in the app local storage, and Firestore keeps an offline cache of your chats on the device. Recorded audio files stay in the app folder and are removed when you uninstall.
 Recordings with no speech are deleted right away. The microphone permission is asked only to record your voice; you can deny it and keep using text.</p>
 <h2>Your rights and how to delete</h2>
 <ul>
-<li>In the app you can <strong>delete an agent</strong> (with its memories) and <strong>clear chat history</strong> (signed-in accounts), but this is not the same as deleting the account, and parts of old content may remain in the database until full deletion.</li>
-<li>To <strong>delete the account and all data</strong>, or to access or correct your data, write to <a href="mailto:joncqs@gmail.com">joncqs@gmail.com</a> from the account email. We will reply within a reasonable time and erase what is under our control.</li>
+<li>In the app you can <strong>delete an agent</strong> (with its memories) and <strong>clear chat history</strong> (signed-in accounts). When you clear history the messages disappear from the app but remain in the database until full deletion; this is not the same as deleting the account.</li>
+<li>To <strong>delete the account and all data</strong>, or to access or correct your data, write to <a href="mailto:joncqs@gmail.com">joncqs@gmail.com</a> from the account email. We will reply within a reasonable time. We carry out the deletion ourselves: it removes the user in Firebase Authentication and the user, chat, message, agent, source and memory documents.</li>
 <li>Data already sent to third-party AI providers follows their rules.</li>
 </ul>
 <h2>Children</h2>
